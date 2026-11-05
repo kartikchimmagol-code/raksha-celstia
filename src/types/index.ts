@@ -1,3 +1,14 @@
+export type NavTab =
+  | 'dashboard'
+  | 'map'
+  | 'rakshak'
+  | 'fraud'
+  | 'routes'
+  | 'walk'
+  | 'contacts'
+  | 'helplines'
+  | 'sos';
+
 export type RiskLevel = 'SAFE' | 'SUSPICIOUS' | 'CRITICAL_RISK';
 
 export interface SafetyPoint {
@@ -36,16 +47,16 @@ export interface EmergencyContact {
 }
 
 export interface FraudAnalysisResult {
-  riskScore: number; // 0 to 100
+  riskScore: number;
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
   verdict: 'SAFE' | 'SUSPICIOUS' | 'DANGEROUS';
-  category: string;
-  scamType?: string;
+  scamType: string;
   summary: string;
-  redFlags: string[];
-  recommendedActions: string[];
-  helpline: string;
-  timestamp: string;
-  rawText: string;
+  indicators: string[];
+  actionPlan: string[];
+  goldenHourAdvice?: string;
+  isAdvisoryOnly?: boolean;
+  engine?: string;
 }
 
 export interface ChatMessage {

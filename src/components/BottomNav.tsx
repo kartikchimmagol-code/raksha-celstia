@@ -1,65 +1,74 @@
 import React from 'react';
-import {
-  ShieldAlert,
-  MapPin,
-  Route,
-  FileSearch,
-  Bot,
-  Users,
-  PhoneCall,
-  Footprints,
-} from 'lucide-react';
-
-export type TabKey =
-  | 'dashboard'
-  | 'map'
-  | 'routes'
-  | 'fraud'
-  | 'assistant'
-  | 'walk'
-  | 'contacts'
-  | 'helplines';
+import { Home, MapPin, Sparkles, Shield, AlertCircle } from 'lucide-react';
+import { NavTab } from '../types';
 
 interface BottomNavProps {
-  activeTab: TabKey;
-  onTabChange: (tab: TabKey) => void;
+  currentTab: NavTab;
+  onSelectTab: (tab: NavTab) => void;
+  onOpenSOS: () => void;
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({
-  activeTab,
-  onTabChange,
+  currentTab,
+  onSelectTab,
+  onOpenSOS,
 }) => {
-  const navItems: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-    { key: 'dashboard', label: 'Command', icon: <ShieldAlert className="w-5 h-5" /> },
-    { key: 'map', label: 'Tactical Map', icon: <MapPin className="w-5 h-5" /> },
-    { key: 'routes', label: 'Safe Routes', icon: <Route className="w-5 h-5" /> },
-    { key: 'fraud', label: 'Fraud Shield', icon: <FileSearch className="w-5 h-5" /> },
-    { key: 'assistant', label: 'Rakshak AI', icon: <Bot className="w-5 h-5" /> },
-    { key: 'walk', label: 'Walk With Me', icon: <Footprints className="w-5 h-5" /> },
-    { key: 'contacts', label: 'Guardians', icon: <Users className="w-5 h-5" /> },
-    { key: 'helplines', label: 'Helplines', icon: <PhoneCall className="w-5 h-5" /> },
+  const tabs = [
+    { id: 'dashboard' as NavTab, label: 'Home', icon: Home },
+    { id: 'map' as NavTab, label: 'Map', icon: MapPin },
+    { id: 'rakshak' as NavTab, label: 'AI', icon: Sparkles },
+    { id: 'fraud' as NavTab, label: 'Fraud', icon: Shield },
+    { id: 'sos' as NavTab, label: 'SOS', icon: AlertCircle, isEmergency: true },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800/80 px-2 py-1.5 shadow-2xl">
-      <div className="max-w-4xl mx-auto flex items-center justify-between overflow-x-auto no-scrollbar gap-1">
-        {navItems.map((item) => {
-          const isActive = activeTab === item.key;
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#090909]/95 backdrop-blur-xl border-t border-[#1C1C1C] px-3 py-2">
+      <div className="max-w-md mx-auto flex items-center justify-around">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = currentTab === tab.id;
+
+          if (tab.isEmergency) {
+            return (
+              <button
+                key={tab.id}
+                onClick={onOpenSOS}
+                className="flex flex-col items-center justify-center py-1 px-3 group transition-transform active:scale-95"
+                aria-label="Emergency SOS"
+              >
+                <div className="relative flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#FF3434]/20 border border-[#FF3434]/50 flex items-center justify-center group-hover:bg-[#FF3434]/30 transition-colors shadow-lg shadow-[#FF3434]/20">
+                    <Icon className="w-4 h-4 text-[#FF3434]" strokeWidth={2.5} />
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold text-[#FF3434] mt-1 tracking-tight">
+                  {tab.label}
+                </span>
+              </button>
+            );
+          }
+
           return (
             <button
-              key={item.key}
-              onClick={() => onTabChange(item.key)}
-              className={`flex flex-col items-center justify-center min-w-[62px] py-1.5 px-1.5 rounded-xl transition-all select-none ${
-                isActive
-                  ? 'text-teal-400 font-bold bg-slate-900 border border-slate-700/80'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
-              }`}
+              key={tab.id}
+              onClick={() => onSelectTab(tab.id)}
+              className="flex flex-col items-center justify-center py-1 px-3 group transition-all active:scale-95"
+              aria-label={tab.label}
             >
-              <div className={`transition-transform ${isActive ? 'scale-105' : ''}`}>
-                {item.icon}
-              </div>
-              <span className="text-[10px] mt-1 tracking-tight truncate max-w-[64px]">
-                {item.label}
+              <Icon
+                className={`w-5 h-5 transition-colors ${
+                  isActive
+                    ? 'text-[#FFD400]'
+                    : 'text-[#A0A0A0] group-hover:text-white'
+                }`}
+                strokeWidth={isActive ? 2.5 : 2}
+              />
+              <span
+                className={`text-[10px] font-semibold mt-1 transition-colors ${
+                  isActive ? 'text-[#FFD400]' : 'text-[#A0A0A0] group-hover:text-white'
+                }`}
+              >
+                {tab.label}
               </span>
             </button>
           );

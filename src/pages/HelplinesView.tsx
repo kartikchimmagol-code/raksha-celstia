@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { PhoneCall, Search, Info } from 'lucide-react';
+import { PhoneCall, Search, Phone, ShieldCheck, AlertCircle } from 'lucide-react';
 import { VERIFIED_HELPLINES } from '../data/mysuruData';
-import { Badge } from '../components/Badge';
 
 export const HelplinesView: React.FC = () => {
   const [search, setSearch] = useState('');
@@ -31,115 +30,81 @@ export const HelplinesView: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6 pb-20">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold text-white tracking-tight">
-            Karnataka Verified Emergency Helplines
-          </h2>
-          <Badge variant="success">GOVERNMENT DIRECTORY</Badge>
-        </div>
-        <p className="text-xs text-slate-400">
-          Official toll-free 24/7 Karnataka State and National emergency numbers with 1-click dial.
-        </p>
+    <div className="space-y-4 pb-24 max-w-md mx-auto animate-in fade-in">
+      {/* Search Input */}
+      <div className="relative">
+        <Search className="w-4 h-4 text-[#A0A0A0] absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search number, service or department..."
+          className="w-full bg-[#1C1C1C] border border-[#2A2A2A] rounded-2xl pl-10 pr-3 py-2.5 text-xs text-white placeholder:text-[#6B7280] focus:outline-none focus:border-[#FFD400]"
+        />
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-2">
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by number, department, or emergency type..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-2xl pl-10 pr-3 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-teal-500 shadow-sm"
-          />
-        </div>
-
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-          {[
-            { key: 'all', label: 'All' },
-            { key: 'police', label: 'Police' },
-            { key: 'women', label: 'Women' },
-            { key: 'cyber', label: 'Cyber 1930' },
-            { key: 'medical', label: 'Medical' },
-          ].map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setSelectedCategory(cat.key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all shrink-0 ${
-                selectedCategory === cat.key
-                  ? 'bg-teal-600/20 text-teal-300 border-teal-500/40'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Helplines List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {filtered.map((item) => (
-          <div
-            key={item.number}
-            className={`p-5 rounded-3xl border transition-all flex flex-col justify-between gap-3 ${
-              item.isPrimary
-                ? 'bg-slate-900 border-slate-700 shadow-lg'
-                : 'bg-slate-900/60 border-slate-800'
+      {/* Category Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+        {[
+          { key: 'all', label: 'All Services' },
+          { key: 'police', label: 'Police 112' },
+          { key: 'cyber', label: 'Cyber 1930' },
+          { key: 'women', label: 'Women 1091' },
+          { key: 'medical', label: 'Medical 108' },
+        ].map((cat) => (
+          <button
+            key={cat.key}
+            onClick={() => setSelectedCategory(cat.key)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
+              selectedCategory === cat.key
+                ? 'bg-[#FFD400] text-[#090909] shadow-md shadow-[#FFD400]/20'
+                : 'bg-[#1C1C1C] border border-[#2A2A2A] text-[#A0A0A0] hover:text-white'
             }`}
           >
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
-                    {item.category}
-                  </span>
-                  <h3 className="text-base font-bold text-white mt-0.5">{item.name}</h3>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-2xl font-black font-mono text-teal-400 tracking-wider">
-                    {item.number}
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs text-slate-300 mt-2 leading-relaxed">{item.description}</p>
-            </div>
-
-            <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                24/7 Toll-Free
-              </span>
-
-              <a
-                href={`tel:${item.number}`}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-1.5 border border-slate-700 shadow transition-all active:scale-95"
-              >
-                <PhoneCall className="w-3.5 h-3.5 text-emerald-400" />
-                Dial {item.number}
-              </a>
-            </div>
-          </div>
+            {cat.label}
+          </button>
         ))}
       </div>
 
-      {/* Emergency Protocol Advisory */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-xs text-slate-300 space-y-2 font-mono shadow-xl">
-        <h4 className="text-amber-400 font-bold flex items-center gap-1.5 text-xs">
-          <Info className="w-4 h-4 text-amber-400" />
-          Karnataka Emergency Response Protocols:
-        </h4>
-        <ul className="space-y-1.5 text-slate-400 text-[11px] list-disc list-inside">
-          <li>State your nearest major landmark first (e.g. &quot;Near K.R. Circle, Sayyaji Rao Road, Mysuru&quot;).</li>
-          <li>For financial fraud, call 1930 within 1-2 hours (&quot;Golden Hour&quot;) so bank nodal officers can freeze the recipient account.</li>
-          <li>Namma 112 dispatches the closest ERSS patrol vehicle and provides SMS tracking links.</li>
-        </ul>
+      {/* Helplines List (Black & Yellow Cards) */}
+      <div className="space-y-2.5">
+        {filtered.map((h) => {
+          const isHighPriority = h.number === '112' || h.number === '1930';
+          return (
+            <div
+              key={h.number}
+              className={`bg-[#1C1C1C] border rounded-2xl p-4 flex items-center justify-between gap-3 shadow-md transition-all ${
+                isHighPriority
+                  ? 'border-[#FFD400]/50 hover:border-[#FFD400]'
+                  : 'border-[#2A2A2A] hover:border-[#404040]'
+              }`}
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono uppercase text-[#FFD400] font-bold">
+                    {h.category}
+                  </span>
+                  {h.isPrimary && (
+                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#090909] text-[#FFD400] border border-[#FFD400]/40 font-bold">
+                      24/7 ACTIVE
+                    </span>
+                  )}
+                </div>
+                <h4 className="text-sm font-bold text-white truncate mt-0.5">{h.name}</h4>
+                <p className="text-[11px] text-[#A0A0A0] truncate mt-0.5">{h.description}</p>
+              </div>
+
+              {/* Dial Button */}
+              <a
+                href={`tel:${h.number}`}
+                className="py-2.5 px-3.5 rounded-xl bg-[#FFD400] hover:bg-[#ffe033] text-[#090909] font-extrabold text-xs flex items-center gap-1.5 shrink-0 shadow-lg shadow-[#FFD400]/20 active:scale-95 transition-all"
+              >
+                <Phone className="w-3.5 h-3.5 fill-current" />
+                <span>{h.number}</span>
+              </a>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

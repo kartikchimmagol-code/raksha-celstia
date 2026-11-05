@@ -37,84 +37,66 @@ export const SirenModal: React.FC<SirenModalProps> = ({ isOpen, onClose }) => {
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-colors duration-150 ${
-        strobeActive && isStrobeColorRed ? 'bg-red-950/85' : 'bg-slate-950/95'
+        strobeActive && isStrobeColorRed ? 'bg-[#FF3434]/80' : 'bg-[#090909]/95'
       }`}
     >
-      <div className="relative w-full max-w-md bg-slate-900 border-2 border-red-500 rounded-3xl p-6 text-center shadow-2xl animate-in fade-in duration-200">
+      <div className="relative w-full max-w-sm bg-[#1C1C1C] border-2 border-[#FF3434] rounded-3xl p-6 text-center shadow-2xl animate-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800"
+          className="absolute top-4 right-4 p-2 text-[#A0A0A0] hover:text-white rounded-full bg-[#090909]"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-red-600/20 border border-red-500/50 flex items-center justify-center text-red-400 mb-4">
-          <AlertTriangle className="w-8 h-8" />
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FF3434]/20 border border-[#FF3434]/50 flex items-center justify-center text-[#FF3434] mb-4">
+          <AlertTriangle className="w-8 h-8" strokeWidth={2.5} />
         </div>
 
-        <h2 className="text-xl font-bold text-white uppercase tracking-wider">
+        <h2 className="text-lg font-extrabold text-white uppercase tracking-wider">
           Acoustic Emergency Alarm
         </h2>
-        <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+        <p className="text-xs text-[#A0A0A0] mt-1.5 leading-relaxed">
           High-decibel acoustic deterrent active to attract immediate public attention and deter threats.
         </p>
 
-        {/* Visual Strobe toggle */}
-        <div className="mt-4 flex items-center justify-center gap-2">
-          <button
-            onClick={() => setStrobeActive(!strobeActive)}
-            className={`px-3 py-1.5 rounded-full text-xs font-mono font-medium border ${
-              strobeActive
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                : 'bg-slate-800 text-slate-400 border-slate-700'
-            }`}
-          >
-            Visual Strobe: {strobeActive ? 'ACTIVE' : 'PAUSED'}
-          </button>
-        </div>
-
-        {/* Primary Siren Actions */}
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="mt-5 space-y-2.5">
           <button
             onClick={() => {
-              if (isPlaying) {
-                stopSiren();
-              } else {
-                startSiren();
-              }
+              if (isPlaying) stopSiren();
+              else startSiren();
             }}
-            className={`w-full py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer ${
+            className={`w-full py-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all ${
               isPlaying
-                ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-950/50'
-                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50'
+                ? 'bg-[#FF3434] text-white hover:bg-[#ff4d4d]'
+                : 'bg-[#FFD400] text-[#090909] hover:bg-[#ffe033]'
             }`}
           >
             {isPlaying ? (
               <>
-                <VolumeX className="w-5 h-5" />
-                MUTE SIREN
+                <VolumeX className="w-4 h-4" />
+                <span>Silence Alarm Sound</span>
               </>
             ) : (
               <>
-                <Volume2 className="w-5 h-5" />
-                RESUME SIREN
+                <Volume2 className="w-4 h-4" />
+                <span>Resume Siren Sound</span>
               </>
             )}
           </button>
 
           <a
             href="tel:112"
-            className="w-full py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold flex items-center justify-center gap-2 text-xs"
+            className="w-full py-3 rounded-2xl bg-[#090909] border border-[#2A2A2A] hover:border-[#FFD400] text-[#FFD400] font-bold text-xs flex items-center justify-center gap-2 transition-colors"
           >
-            <PhoneCall className="w-4 h-4 text-emerald-400" />
-            Direct Dial: Namma 112 (Karnataka Police)
+            <PhoneCall className="w-4 h-4" />
+            <span>Dial Police 112 Speed-Dial</span>
           </a>
 
           <button
             onClick={onClose}
-            className="w-full py-2 text-xs text-slate-400 hover:text-slate-200"
+            className="w-full py-2.5 rounded-2xl bg-[#1C1C1C] border border-[#2A2A2A] text-xs font-semibold text-[#A0A0A0] hover:text-white transition-colors"
           >
-            Dismiss and return to dashboard
+            Dismiss Siren
           </button>
         </div>
       </div>

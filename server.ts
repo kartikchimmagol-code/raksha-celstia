@@ -45,7 +45,7 @@ async function startServer() {
     res.json({
       status: 'ok',
       hasGeminiKey: !!ai,
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.8-flash',
       version: '2.0.0-hackathon-ready',
       serverTime: new Date().toISOString(),
     });
@@ -61,7 +61,7 @@ async function startServer() {
       const {
         messages,
         systemInstruction,
-        model = 'gemini-2.5-flash',
+        model = 'gemini-3.8-flash',
       } = req.body;
 
       if (!ai) {
@@ -99,7 +99,7 @@ Your core expertise includes:
 Tone: Calm, authoritative, empathetic, practical, and concise. Format critical emergency numbers or immediate safety steps clearly with bullet points. Never provide false reassurance or pretend an alert was sent if you are only chatting.`;
 
       const response = await ai.models.generateContent({
-        model: model === 'gemini-3.8-flash' ? 'gemini-2.5-flash' : model,
+        model: 'gemini-3.8-flash',
         contents,
         config: {
           systemInstruction: systemInstruction || defaultSystemInstruction,
@@ -177,7 +177,7 @@ Respond ONLY in this strict JSON format with no Markdown code block ticks:
           });
 
           const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.8-flash',
             contents: [{ role: 'user', parts }],
             config: {
               temperature: 0.2, // Low temperature for consistent forensic accuracy
@@ -190,7 +190,7 @@ Respond ONLY in this strict JSON format with no Markdown code block ticks:
             const parsed = JSON.parse(jsonMatch[0]);
             return res.json({
               ...parsed,
-              engine: 'gemini-2.5-flash',
+              engine: 'gemini-3.8-flash',
               isLiveAI: true,
             });
           }

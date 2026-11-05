@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
-import { BottomNav, TabKey } from './components/BottomNav';
+import { BottomNav } from './components/BottomNav';
 import { SirenModal } from './components/SirenModal';
 import { FakeCallModal } from './components/FakeCallModal';
+import { EmergencySOSModal } from './components/EmergencySOSModal';
+import { SplashScreen } from './components/SplashScreen';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { EmergencyContact } from './types';
+import { EmergencyContact, NavTab } from './types';
 
 // Tab Pages
 import { Dashboard } from './pages/Dashboard';
@@ -20,14 +22,14 @@ import { HelplinesView } from './pages/HelplinesView';
 const DEFAULT_CONTACTS: EmergencyContact[] = [
   {
     id: 'c-1',
-    name: 'Home / Amma',
+    name: 'Home / Appa (Mysuru)',
     phone: '9845012345',
     relationship: 'Family',
     isPrimary: true,
   },
   {
     id: 'c-2',
-    name: 'Brother (Kuvempunagar)',
+    name: 'Guardian / Sister (Gokulam)',
     phone: '9845067890',
     relationship: 'Family',
     isPrimary: false,
@@ -41,49 +43,55 @@ export function App() {
     DEFAULT_CONTACTS
   );
 
-  const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
+  const [showSplash, setShowSplash] = useState(true);
+  const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
   const [isSirenOpen, setIsSirenOpen] = useState(false);
   const [isFakeCallOpen, setIsFakeCallOpen] = useState(false);
+  const [isSOSOpen, setIsSOSOpen] = useState(false);
   const [isDecoyMode, setIsDecoyMode] = useState(false);
 
-  // Escort hand-off state from Map
+  // Escort hand-off state from Map to Walk With Me
   const [escortDestination, setEscortDestination] = useState<string | undefined>();
   const [escortEtaMins, setEscortEtaMins] = useState<number | undefined>();
 
   const handleStartWalkFromMap = (dest: string, etaMins: number) => {
     setEscortDestination(dest);
     setEscortEtaMins(etaMins);
-    setActiveTab('walk');
+    setCurrentTab('walk');
   };
 
-  // Decoy Notes App Screen
+  // Show Splash screen on initial load
+  if (showSplash) {
+    return <SplashScreen onDismiss={() => setShowSplash(false)} />;
+  }
+
+  // Decoy Notes App Screen (Discreet safety mode)
   if (isDecoyMode) {
     return (
-      <div className="min-h-screen bg-slate-900 text-slate-100 p-6 flex flex-col justify-between font-sans">
-        <div className="max-w-lg mx-auto w-full space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h2 className="text-lg font-bold text-slate-300">Quick Study Notes</h2>
+      <div className="min-h-screen bg-[#090909] text-white p-6 flex flex-col justify-between font-sans">
+        <div className="max-w-md mx-auto w-full space-y-4">
+          <div className="flex items-center justify-between border-b border-[#1C1C1C] pb-3">
+            <h2 className="text-base font-bold text-slate-300">Quick Study Notes</h2>
             <button
               onClick={() => setIsDecoyMode(false)}
-              className="text-xs text-slate-500 hover:text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg"
-              title="Double tap to unlock RAKSHA"
+              className="text-xs text-[#A0A0A0] hover:text-[#FFD400] border border-[#2A2A2A] px-2.5 py-1 rounded-xl"
             >
               Exit Notes
             </button>
           </div>
-          <div className="space-y-3 text-xs text-slate-400 font-mono">
-            <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
-              <span className="text-slate-300 font-semibold block mb-1">
-                Operating Systems - Memory Management:
+          <div className="space-y-3 text-xs text-[#A0A0A0] font-mono">
+            <div className="p-3 bg-[#1C1C1C] rounded-2xl border border-[#2A2A2A]">
+              <span className="text-white font-semibold block mb-1">
+                Data Structures &amp; Algorithms:
               </span>
-              <p>• Paging breaks virtual memory into fixed-size blocks (pages).</p>
-              <p>• Translation Lookaside Buffer (TLB) speeds up virtual-to-physical address mapping.</p>
+              <p>• Dijkstra&apos;s algorithm finds single-source shortest paths in weighted graphs.</p>
+              <p>• A* heuristic enhances pathfinding toward destination coordinates.</p>
             </div>
-            <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
-              <span className="text-slate-300 font-semibold block mb-1">
-                Computer Networks:
+            <div className="p-3 bg-[#1C1C1C] rounded-2xl border border-[#2A2A2A]">
+              <span className="text-white font-semibold block mb-1">
+                Network Security:
               </span>
-              <p>• TCP provides reliable, ordered byte-stream delivery with congestion control.</p>
+              <p>• HTTPS provides TLS encryption and certificate authenticity verification.</p>
             </div>
           </div>
         </div>
@@ -91,7 +99,7 @@ export function App() {
         <div className="text-center pt-8">
           <button
             onClick={() => setIsDecoyMode(false)}
-            className="text-[11px] font-mono text-slate-600 hover:text-slate-400"
+            className="text-[10px] font-mono text-[#6B7280] hover:text-[#A0A0A0]"
           >
             [Tap here to return to RAKSHA Command]
           </button>
@@ -101,65 +109,89 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
-      {/* Sticky Command Bar */}
-      <Navbar
-        geoState={geoState}
-        onOpenSiren={() => setIsSirenOpen(true)}
-        onOpenFakeCall={() => setIsFakeCallOpen(true)}
-        isDecoyMode={isDecoyMode}
-        onToggleDecoy={() => setIsDecoyMode(!isDecoyMode)}
-      />
+    <div className="min-h-screen bg-[#090909] text-white flex flex-col items-center justify-center selection:bg-[#FFD400] selection:text-[#090909]">
+      {/* Mobile-First Frame Container (Resembles high-end smartphone on desktop, native on mobile) */}
+      <div className="w-full max-w-md min-h-screen bg-[#090909] sm:border-x border-[#1C1C1C] flex flex-col relative shadow-2xl">
+        {/* Sticky Mobile Top Header */}
+        <Navbar
+          currentTab={currentTab}
+          onSelectTab={setCurrentTab}
+          geoState={geoState}
+          userName="Kartik"
+          onOpenSOS={() => setIsSOSOpen(true)}
+        />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 pt-4 pb-12">
-        {activeTab === 'dashboard' && (
-          <Dashboard
-            geoState={geoState}
-            contacts={contacts}
-            onNavigateTab={setActiveTab}
-            onOpenSiren={() => setIsSirenOpen(true)}
-            onOpenFakeCall={() => setIsFakeCallOpen(true)}
-          />
-        )}
-        {activeTab === 'map' && (
-          <MapView
-            geoState={geoState}
-            onStartWalkEscort={handleStartWalkFromMap}
-          />
-        )}
-        {activeTab === 'routes' && <RoutesView />}
-        {activeTab === 'fraud' && <FraudShield />}
-        {activeTab === 'assistant' && <RakshakAI />}
-        {activeTab === 'walk' && (
-          <WalkWithMe
-            geoState={geoState}
-            onOpenSiren={() => setIsSirenOpen(true)}
-            initialDestination={escortDestination}
-            initialEtaMins={escortEtaMins}
-          />
-        )}
-        {activeTab === 'contacts' && (
-          <ContactsView
-            contacts={contacts}
-            setContacts={setContacts}
-            geoState={geoState}
-          />
-        )}
-        {activeTab === 'helplines' && <HelplinesView />}
-      </main>
+        {/* Main Content Viewport */}
+        <main className="flex-1 px-4 pt-3 pb-16 overflow-y-auto">
+          {currentTab === 'dashboard' && (
+            <Dashboard
+              onSelectTab={setCurrentTab}
+              onOpenSOS={() => setIsSOSOpen(true)}
+              onOpenSiren={() => setIsSirenOpen(true)}
+              onTriggerFakeCall={() => setIsFakeCallOpen(true)}
+              geoState={geoState}
+              userName="Kartik"
+            />
+          )}
 
-      {/* Tactical Bottom Navigation Dock */}
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+          {currentTab === 'map' && (
+            <MapView
+              geoState={geoState}
+              onStartWalkEscort={handleStartWalkFromMap}
+            />
+          )}
 
-      {/* Acoustic Screamer & Strobe Modal */}
-      <SirenModal isOpen={isSirenOpen} onClose={() => setIsSirenOpen(false)} />
+          {currentTab === 'rakshak' && <RakshakAI />}
 
-      {/* Simulated Incoming Emergency Call */}
-      <FakeCallModal
-        isOpen={isFakeCallOpen}
-        onClose={() => setIsFakeCallOpen(false)}
-      />
+          {currentTab === 'fraud' && <FraudShield />}
+
+          {currentTab === 'routes' && <RoutesView />}
+
+          {currentTab === 'walk' && (
+            <WalkWithMe
+              geoState={geoState}
+              onOpenSiren={() => setIsSirenOpen(true)}
+              initialDestination={escortDestination}
+              initialEtaMins={escortEtaMins}
+            />
+          )}
+
+          {currentTab === 'contacts' && (
+            <ContactsView
+              contacts={contacts}
+              setContacts={setContacts}
+              geoState={geoState}
+            />
+          )}
+
+          {currentTab === 'helplines' && <HelplinesView />}
+        </main>
+
+        {/* Fixed Mobile Bottom Navigation Bar (Matches Mockup 2 & 3) */}
+        <BottomNav
+          currentTab={currentTab}
+          onSelectTab={setCurrentTab}
+          onOpenSOS={() => setIsSOSOpen(true)}
+        />
+
+        {/* Emergency SOS Modal */}
+        <EmergencySOSModal
+          isOpen={isSOSOpen}
+          onClose={() => setIsSOSOpen(false)}
+          onOpenSiren={() => setIsSirenOpen(true)}
+          contacts={contacts}
+          geoState={geoState}
+        />
+
+        {/* Acoustic Strobe Siren Modal */}
+        <SirenModal isOpen={isSirenOpen} onClose={() => setIsSirenOpen(false)} />
+
+        {/* Simulated Incoming Escape Call */}
+        <FakeCallModal
+          isOpen={isFakeCallOpen}
+          onClose={() => setIsFakeCallOpen(false)}
+        />
+      </div>
     </div>
   );
 }
