@@ -30,8 +30,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   onTabChange,
 }) => {
   const navItems: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-    { key: 'dashboard', label: 'Overview', icon: <ShieldAlert className="w-5 h-5" /> },
-    { key: 'map', label: 'Safety Map', icon: <MapPin className="w-5 h-5" /> },
+    { key: 'dashboard', label: 'Command', icon: <ShieldAlert className="w-5 h-5" /> },
+    { key: 'map', label: 'Tactical Map', icon: <MapPin className="w-5 h-5" /> },
     { key: 'routes', label: 'Safe Routes', icon: <Route className="w-5 h-5" /> },
     { key: 'fraud', label: 'Fraud Shield', icon: <FileSearch className="w-5 h-5" /> },
     { key: 'assistant', label: 'Rakshak AI', icon: <Bot className="w-5 h-5" /> },
@@ -41,7 +41,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800/80 px-2 py-1.5">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800/80 px-2 py-1.5 shadow-2xl">
       <div className="max-w-4xl mx-auto flex items-center justify-between overflow-x-auto no-scrollbar gap-1">
         {navItems.map((item) => {
           const isActive = activeTab === item.key;
@@ -49,16 +49,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <button
               key={item.key}
               onClick={() => onTabChange(item.key)}
-              className={`flex flex-col items-center justify-center min-w-[64px] py-1.5 px-2 rounded-xl transition-all select-none ${
+              className={`flex flex-col items-center justify-center min-w-[62px] py-1.5 px-1.5 rounded-xl transition-all select-none ${
                 isActive
-                  ? 'text-rose-400 font-semibold bg-rose-500/10 border border-rose-500/20 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                  ? 'text-teal-400 font-bold bg-slate-900 border border-slate-700/80'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
               }`}
             >
-              <div className={`transition-transform ${isActive ? 'scale-110' : ''}`}>
+              <div className={`transition-transform ${isActive ? 'scale-105' : ''}`}>
                 {item.icon}
               </div>
-              <span className="text-[10px] mt-1 tracking-tight truncate max-w-[68px]">
+              <span className="text-[10px] mt-1 tracking-tight truncate max-w-[64px]">
                 {item.label}
               </span>
             </button>

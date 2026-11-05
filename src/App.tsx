@@ -46,6 +46,16 @@ export function App() {
   const [isFakeCallOpen, setIsFakeCallOpen] = useState(false);
   const [isDecoyMode, setIsDecoyMode] = useState(false);
 
+  // Escort hand-off state from Map
+  const [escortDestination, setEscortDestination] = useState<string | undefined>();
+  const [escortEtaMins, setEscortEtaMins] = useState<number | undefined>();
+
+  const handleStartWalkFromMap = (dest: string, etaMins: number) => {
+    setEscortDestination(dest);
+    setEscortEtaMins(etaMins);
+    setActiveTab('walk');
+  };
+
   // Decoy Notes App Screen
   if (isDecoyMode) {
     return (
@@ -91,7 +101,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
       {/* Sticky Command Bar */}
       <Navbar
         geoState={geoState}
@@ -112,7 +122,12 @@ export function App() {
             onOpenFakeCall={() => setIsFakeCallOpen(true)}
           />
         )}
-        {activeTab === 'map' && <MapView geoState={geoState} />}
+        {activeTab === 'map' && (
+          <MapView
+            geoState={geoState}
+            onStartWalkEscort={handleStartWalkFromMap}
+          />
+        )}
         {activeTab === 'routes' && <RoutesView />}
         {activeTab === 'fraud' && <FraudShield />}
         {activeTab === 'assistant' && <RakshakAI />}
@@ -120,6 +135,8 @@ export function App() {
           <WalkWithMe
             geoState={geoState}
             onOpenSiren={() => setIsSirenOpen(true)}
+            initialDestination={escortDestination}
+            initialEtaMins={escortEtaMins}
           />
         )}
         {activeTab === 'contacts' && (

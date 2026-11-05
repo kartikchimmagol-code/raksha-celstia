@@ -49,7 +49,7 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
 
   const generateWhatsAppLink = (contact: EmergencyContact) => {
     const cleanPhone = contact.phone.replace(/[^0-9]/g, '');
-    const message = `[TEST EMERGENCY BROADCAST - RAKSHA] Hi ${contact.name}, this is a test alert. My current location in Mysuru: https://www.google.com/maps?q=${geoState.coords[0]},${geoState.coords[1]}`;
+    const message = `[TEST EMERGENCY BROADCAST - RAKSHA] Hi ${contact.name}, this is an authorized test alert. My current location in Mysuru: https://www.google.com/maps?q=${geoState.coords[0]},${geoState.coords[1]}`;
     return `https://wa.me/${cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone}?text=${encodeURIComponent(message)}`;
   };
 
@@ -63,13 +63,13 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
             <Badge variant="success">{contacts.length} Configured</Badge>
           </div>
           <p className="text-xs text-slate-400">
-            Contacts who receive your live coordinates and distress broadcast when SOS is triggered.
+            Designated trusted individuals who receive distress coordinates when an SOS broadcast is triggered.
           </p>
         </div>
 
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow"
+          className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow cursor-pointer"
         >
           <UserPlus className="w-4 h-4" />
           {showAddForm ? 'Cancel' : 'Add Guardian'}
@@ -80,15 +80,15 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
       {showAddForm && (
         <form
           onSubmit={handleAddContact}
-          className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 animate-in fade-in"
+          className="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 animate-in fade-in shadow-xl"
         >
           <h3 className="text-xs font-mono font-bold text-slate-300 uppercase">
-            New Guardian Information
+            New Guardian Details
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="text-[10px] font-mono uppercase text-slate-400 block mb-1">
+              <label className="text-[10px] font-mono uppercase text-slate-400 block mb-1 font-semibold">
                 Full Name
               </label>
               <input
@@ -97,12 +97,12 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Ramesh (Father)"
                 required
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-mono uppercase text-slate-400 block mb-1">
+              <label className="text-[10px] font-mono uppercase text-slate-400 block mb-1 font-semibold">
                 Phone Number (with Country Code)
               </label>
               <input
@@ -111,18 +111,18 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. 9845012345"
                 required
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-mono uppercase text-slate-400 block mb-1">
+              <label className="text-[10px] font-mono uppercase text-slate-400 block mb-1 font-semibold">
                 Relationship
               </label>
               <select
                 value={relationship}
                 onChange={(e) => setRelationship(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
               >
                 <option value="Family">Family / Parent</option>
                 <option value="Spouse">Spouse / Partner</option>
@@ -136,7 +136,7 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
           <div className="flex justify-end pt-2">
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs"
+              className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs shadow cursor-pointer"
             >
               Save Guardian Contact
             </button>
@@ -147,7 +147,7 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
       {/* Contacts List */}
       <div className="space-y-3">
         {contacts.length === 0 ? (
-          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 space-y-2">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-slate-400 space-y-2">
             <Users className="w-8 h-8 mx-auto text-slate-600" />
             <p className="text-sm font-medium">No emergency guardians added yet.</p>
             <p className="text-xs text-slate-500">
@@ -158,17 +158,17 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
           contacts.map((contact) => (
             <div
               key={contact.id}
-              className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+              className={`p-4 sm:p-5 rounded-3xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                 contact.isPrimary
-                  ? 'bg-slate-900/90 border-rose-500/50 shadow-md shadow-rose-950/20'
-                  : 'bg-slate-900/60 border-slate-800'
+                  ? 'bg-slate-900 border-teal-500/50 shadow-lg'
+                  : 'bg-slate-900 border-slate-800'
               }`}
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-sm ${
                     contact.isPrimary
-                      ? 'bg-rose-600 text-white shadow'
+                      ? 'bg-teal-600 text-white shadow'
                       : 'bg-slate-800 text-slate-300'
                   }`}
                 >
@@ -179,8 +179,8 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
                   <div className="flex items-center gap-2">
                     <h4 className="text-sm font-bold text-white">{contact.name}</h4>
                     {contact.isPrimary && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
-                        <Star className="w-2.5 h-2.5 fill-rose-300" /> PRIMARY
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-teal-600/20 text-teal-300 border border-teal-500/30 flex items-center gap-1 font-semibold">
+                        <Star className="w-2.5 h-2.5 fill-teal-300" /> PRIMARY
                       </span>
                     )}
                   </div>
@@ -221,7 +221,7 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
 
                 <button
                   onClick={() => handleDelete(contact.id)}
-                  className="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-slate-800"
+                  className="p-2 rounded-xl text-slate-500 hover:text-red-400 hover:bg-slate-800"
                   title="Delete contact"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -232,9 +232,9 @@ export const ContactsView: React.FC<ContactsViewProps> = ({ contacts, setContact
         )}
       </div>
 
-      <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-xl text-xs text-slate-400 flex items-center gap-2 font-mono text-[11px]">
+      <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl text-xs text-slate-400 flex items-center gap-2 font-mono text-[11px]">
         <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-        <span>All emergency contact numbers are encrypted in local storage on this device.</span>
+        <span>All emergency contact numbers remain locally persisted on this device only.</span>
       </div>
     </div>
   );

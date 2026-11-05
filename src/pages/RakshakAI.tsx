@@ -1,5 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, Send, User, Sparkles, AlertCircle, Copy, Check, PhoneCall } from 'lucide-react';
+import {
+  Bot,
+  Send,
+  User,
+  Sparkles,
+  AlertCircle,
+  Copy,
+  Check,
+  PhoneCall,
+  RotateCcw,
+  ShieldAlert,
+  Key,
+} from 'lucide-react';
 import { ChatMessage } from '../types';
 import { Badge } from '../components/Badge';
 
@@ -8,14 +20,35 @@ export const RakshakAI: React.FC = () => {
     {
       id: 'msg-welcome',
       role: 'model',
-      text: 'Namaskara! I am Rakshak AI, your dedicated personal safety & digital threat companion for Mysuru and Karnataka.\n\nI can assist you with:\n• Late night commuter safety & safe corridors in Mysuru\n• Immediate crisis guidance & verified helplines (112, 1091, 108)\n• Verification of suspicious SMS, electricity bill threats, or APKs (1930)\n\nHow can I support your safety right now?',
+      text: 'Namaskara! I am Rakshak AI, your personal safety & cyber defense companion for Mysuru and Karnataka.\n\nI can assist you with:\n• Safe transit corridors in Mysuru (Sayyaji Rao Rd, JLB Rd, Kuvempunagar, Chamundi ascent precautions)\n• Immediate crisis guidance and verified helplines (112, 1091, 108)\n• Real-time analysis of suspicious SMS, power cutoff alerts, or phishing links\n• Emergency procedures for the 1930 Cyber Fraud "Golden Hour"\n\nHow can I help protect you right now?',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [lastFailedText, setLastFailedText] = useState<string | null>(null);
+  const [aiStatus, setAiStatus] = useState<{ hasKey: boolean; model: string }>({
+    hasKey: false,
+    model: 'gemini-2.5-flash',
+  });
+
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Check backend Gemini AI configuration status on mount
+  useEffect(() => {
+    fetch('/api/config-status')
+      .then((res) => res.json())
+      .then((data) => {
+        setAiStatus({
+          hasKey: !!data.hasGeminiKey,
+          model: data.model || 'gemini-2.5-flash',
+        });
+      })
+      .catch(() => {
+        setAiStatus({ hasKey: false, model: 'gemini-2.5-flash' });
+      });
+  }, []);
 
   const quickPrompts = [
     'I feel followed near Bamboo Bazar after 10 PM. What should I do?',
@@ -43,9 +76,9 @@ export const RakshakAI: React.FC = () => {
     setMessages(newMessages);
     setInput('');
     setIsLoading(true);
+    setLastFailedText(null);
 
     try {
-      // Build multi-turn history payload for server.ts
       const apiMessages = newMessages.map((m) => ({
         role: m.role === 'user' ? 'user' : 'model',
         text: m.text,
@@ -54,30 +87,42 @@ export const RakshakAI: React.FC = () => {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: apiMessages }),
+        body: JSON.stringify({
+          messages: apiMessages,
+          model: aiStatus.model,
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-
       const data = await response.json();
-      const modelText = data.text || 'I could not process that request. Please contact 112 if you are in immediate danger.';
+
+      if (!response.ok) {
+        if (data.isConfigError) {
+          const configMsg: ChatMessage = {
+            id: `msg-${Date.now()}-config-err`,
+            role: 'model',
+            text: '⚠️ [GEMINI API KEY REQUIRED]\n\nLive generative reasoning requires a Google Gemini API key.\n\nTo activate live AI:\n1. Open your project folder.\n2. Add your key to .env: `GEMINI_API_KEY="your-gemini-key"`\n3. Restart the server.\n\nIn the meantime, the verified Karnataka Emergency Directory is fully operational below:',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          };
+          setMessages((prev) => [...prev, configMsg]);
+          return;
+        }
+        throw new Error(data.error || 'Server returned an error.');
+      }
 
       const modelMessage: ChatMessage = {
         id: `msg-${Date.now()}-model`,
         role: 'model',
-        text: modelText,
+        text: data.text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
       setMessages((prev) => [...prev, modelMessage]);
-    } catch {
-      // Graceful offline fallback
+    } catch (err: any) {
+      setLastFailedText(text);
       const fallbackMessage: ChatMessage = {
         id: `msg-${Date.now()}-err`,
         role: 'model',
-        text: '⚠️ Unable to connect to the cloud AI server right now.\n\nIf you are facing an active emergency in Mysuru or Karnataka, please use direct emergency lines:\n• Namma 112 (Unified Police & Emergency)\n• 1091 (Women Distress Helpline)\n• 1930 (National Cyber Crime & Financial Fraud)\n• 108 (Arogya Kavacha Ambulance)',
+        text: `⚠️ Communication error: ${err.message || 'Unable to reach Gemini backend'}.\n\nIf you are facing an active emergency in Mysuru, please call directly:\n• 112 (Namma 112 Unified Police & Emergency)\n• 1091 (Women Distress Helpline)\n• 1930 (Cyber Crime Helpline)`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, fallbackMessage]);
@@ -94,33 +139,47 @@ export const RakshakAI: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-20 flex flex-col h-[calc(100vh-140px)]">
-      {/* Top Header */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold text-white tracking-tight">Rakshak AI Assistant</h2>
-            <Badge variant="info">GEMINI 3.8 FLASH</Badge>
+            <Badge variant={aiStatus.hasKey ? 'success' : 'warning'}>
+              {aiStatus.hasKey ? 'GEMINI 2.5 FLASH ONLINE' : 'OFFLINE SAFETY PROTOCOL'}
+            </Badge>
           </div>
           <p className="text-xs text-slate-400">
-            Expert safety and cyber threat companion for Mysuru & Karnataka.
+            Context-aware safety advisor for Mysuru landmarks & Karnataka emergency laws.
           </p>
         </div>
 
         <div className="flex items-center gap-1.5">
           <a
             href="tel:112"
-            className="px-2.5 py-1 rounded-lg bg-rose-600/20 text-rose-400 border border-rose-500/30 text-xs font-mono font-bold flex items-center gap-1"
+            className="px-2.5 py-1 rounded-lg bg-rose-600/20 text-rose-400 border border-rose-500/30 text-xs font-mono font-bold flex items-center gap-1 hover:bg-rose-600/30"
           >
             <PhoneCall className="w-3 h-3" /> 112
           </a>
           <a
             href="tel:1930"
-            className="px-2.5 py-1 rounded-lg bg-amber-600/20 text-amber-400 border border-amber-500/30 text-xs font-mono font-bold flex items-center gap-1"
+            className="px-2.5 py-1 rounded-lg bg-amber-600/20 text-amber-400 border border-amber-500/30 text-xs font-mono font-bold flex items-center gap-1 hover:bg-amber-600/30"
           >
             <PhoneCall className="w-3 h-3" /> 1930
           </a>
         </div>
       </div>
+
+      {/* Notice if API key is missing */}
+      {!aiStatus.hasKey && (
+        <div className="p-3 rounded-2xl bg-slate-900 border border-amber-500/30 text-xs text-slate-300 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Key className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>
+              Live Gemini reasoning is in verified offline standby. Add <code className="text-amber-400">GEMINI_API_KEY</code> to <code className="text-slate-200">.env</code> to connect live Google AI.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Quick Prompt Chips */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 shrink-0">
@@ -149,7 +208,7 @@ export const RakshakAI: React.FC = () => {
                 className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white shadow ${
                   isUser
                     ? 'bg-rose-600'
-                    : 'bg-gradient-to-tr from-cyan-600 to-sky-500 border border-cyan-400/30'
+                    : 'bg-gradient-to-tr from-teal-600 to-sky-600 border border-teal-400/30'
                 }`}
               >
                 {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -190,10 +249,22 @@ export const RakshakAI: React.FC = () => {
 
         {isLoading && (
           <div className="flex items-center gap-2 text-slate-400 text-xs font-mono p-2">
-            <Sparkles className="w-4 h-4 text-cyan-400 animate-spin" />
-            <span>Rakshak AI analyzing safety protocol...</span>
+            <Sparkles className="w-4 h-4 text-teal-400 animate-spin" />
+            <span>Rakshak AI analyzing safety guidelines...</span>
           </div>
         )}
+
+        {lastFailedText && (
+          <div className="flex items-center gap-2 p-2">
+            <button
+              onClick={() => handleSendMessage(lastFailedText)}
+              className="text-xs text-rose-400 hover:text-rose-300 font-mono flex items-center gap-1 underline"
+            >
+              <RotateCcw className="w-3 h-3" /> Retry last question
+            </button>
+          </div>
+        )}
+
         <div ref={chatEndRef} />
       </div>
 
@@ -204,20 +275,20 @@ export const RakshakAI: React.FC = () => {
             e.preventDefault();
             handleSendMessage();
           }}
-          className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-2xl p-1.5 focus-within:border-rose-500"
+          className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-2xl p-1.5 focus-within:border-teal-500 shadow-xl"
         >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Rakshak AI about Mysuru routes, scams, or safety steps..."
+            placeholder="Ask Rakshak AI about Mysuru routes, legal rights, or fraud checks..."
             disabled={isLoading}
             className="flex-1 bg-transparent px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none"
           />
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="p-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 text-white hover:from-rose-500 hover:to-red-500 disabled:opacity-40 transition-all cursor-pointer"
+            className="p-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white disabled:opacity-40 transition-all cursor-pointer shadow"
           >
             <Send className="w-4 h-4" />
           </button>
