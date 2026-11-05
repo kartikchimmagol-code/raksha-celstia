@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
+  const PORT = Number(process.env.DEFAULT_APP_PORT) || 3000;
 
   // Support JSON payloads up to 25MB for screenshot/image uploads
   app.use(express.json({ limit: '25mb' }));
@@ -78,9 +78,9 @@ async function startServer() {
 
       // Format multi-turn conversation history for @google/genai SDK
       const contents = messages.map(
-        (m: { role: 'user' | 'model'; text: string }) => ({
+        (m: { role: 'user' | 'model'; text?: string; content?: string }) => ({
           role: m.role === 'user' ? 'user' : 'model',
-          parts: [{ text: m.text }],
+          parts: [{ text: m.text || m.content || '' }],
         })
       );
 
@@ -112,6 +112,27 @@ Tone: Calm, authoritative, empathetic, practical, and concise. Format critical e
       console.error('Gemini Chat error:', err);
       const errorMessage =
         err instanceof Error ? err.message : 'Unknown server error';
+
+      // Fallback for emergency safety questions during upstream service spikes
+      const msgs = req.body?.messages;
+      const lastUserMsg = (Array.isArray(msgs) && (msgs[msgs.length - 1]?.text || msgs[msgs.length - 1]?.content)) || '';
+      const lower = lastUserMsg.toLowerCase();
+      if (
+        lower.includes('follow') ||
+        lower.includes('alone') ||
+        lower.includes('danger') ||
+        lower.includes('help') ||
+        lower.includes('night') ||
+        lower.includes('palace') ||
+        lower.includes('emergency') ||
+        lower.includes('safe')
+      ) {
+        return res.json({
+          text: `🚨 **Immediate Safety Guidance (Mysuru Command)**:\n\n1. **Move Toward Illuminated Areas**: Head immediately toward K.R. Circle or Sayyaji Rao Road where shops, restaurants, and autorickshaws are active.\n2. **Call Karnataka Emergency 112**: State-wide emergency dispatch (Police, Fire, Ambulance).\n3. **Call Women Distress Helpline**: Dial **1091** or Mysuru Police Control Room at **100**.\n4. **Trigger RAKSHA SOS**: Tap the red SOS button in the bottom navigation bar to alert your emergency contacts with live GPS coordinates.\n5. **Acoustic Strobe**: Activate the Siren button on your dashboard to draw immediate public attention.\n\n*Note: Operating in local tactical safety mode during upstream network spikes.*`,
+          isFallback: true,
+        });
+      }
+
       return res.status(500).json({
         error: `Gemini API error: ${errorMessage}`,
       });

@@ -1,0 +1,72 @@
+{
+  "name": "RAKSHA — Personal Safety & Digital Threat Shield",
+  "short_name": "RAKSHA",
+  "description": "Mobile-first personal safety platform with historical crime-risk maps, safer routing, digital fraud shield, and emergency SOS",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#090909",
+  "theme_color": "#090909",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["safety", "utilities", "navigation", "security"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Emergency SOS",
+      "short_name": "SOS",
+      "description": "Broadcast emergency distress and location alert",
+      "url": "/?tab=sos",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Tactical Map",
+      "short_name": "Map",
+      "description": "View verified police stations and safe corridors",
+      "url": "/?tab=map",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Fraud Shield",
+      "short_name": "Fraud",
+      "description": "Analyze suspicious SMS, URLs, and screenshots",
+      "url": "/?tab=fraud",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Walk With Me",
+      "short_name": "Walk",
+      "description": "Start a live virtual walk escort",
+      "url": "/?tab=walk",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
+  ]
+}

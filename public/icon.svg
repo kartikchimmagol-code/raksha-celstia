@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#1C1C1C"/>
+      <stop offset="100%" stop-color="#090909"/>
+    </radialGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="50%" stop-color="#FFD400"/>
+      <stop offset="100%" stop-color="#E5BE00"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#FFD400" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  <rect width="504" height="504" x="4" y="4" rx="108" fill="none" stroke="#2A2A2A" stroke-width="2"/>
+
+  <!-- Radar Concentric Rings -->
+  <circle cx="256" cy="256" r="190" fill="none" stroke="#1C1C1C" stroke-width="2" stroke-dasharray="6 8"/>
+  <circle cx="256" cy="256" r="130" fill="none" stroke="#252525" stroke-width="2"/>
+
+  <!-- Tactical Crosshairs -->
+  <line x1="256" y1="48" x2="256" y2="96" stroke="#FFD400" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <line x1="256" y1="416" x2="256" y2="464" stroke="#FFD400" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <line x1="48" y1="256" x2="96" y2="256" stroke="#FFD400" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+  <line x1="416" y1="256" x2="464" y2="256" stroke="#FFD400" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Outer Defensive Shield -->
+  <path d="M 256 100 L 376 150 C 376 270 316 350 256 400 C 196 350 136 270 136 150 Z"
+        fill="url(#shieldGrad)"
+        filter="url(#glow)"/>
+
+  <!-- Inner Dark Armor Core -->
+  <path d="M 256 128 L 350 168 C 350 262 304 326 256 366 C 208 326 162 262 162 168 Z"
+        fill="#090909"
+        stroke="#2A2A2A"
+        stroke-width="3"/>
+
+  <!-- Electric Yellow Safety Star / Beacon -->
+  <path d="M 256 180 L 268 222 L 310 224 L 276 250 L 288 290 L 256 264 L 224 290 L 236 250 L 202 224 L 244 222 Z"
+        fill="#FFD400"/>
+
+  <!-- Core Pulse Point -->
+  <circle cx="256" cy="242" r="12" fill="#090909"/>
+  <circle cx="256" cy="242" r="5" fill="#FFD400"/>
+</svg>

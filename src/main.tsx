@@ -8,3 +8,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <App />
   </React.StrictMode>
 );
+
+// Register PWA service worker
+if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => {
+        console.log('RAKSHA PWA Service Worker registered:', reg.scope);
+      })
+      .catch((err) => {
+        console.warn('RAKSHA Service Worker registration failed:', err);
+      });
+  });
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { BottomNav } from './components/BottomNav';
 import { SirenModal } from './components/SirenModal';
@@ -8,6 +8,7 @@ import { SplashScreen } from './components/SplashScreen';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { EmergencyContact, NavTab } from './types';
+import { Download, X } from 'lucide-react';
 
 // Tab Pages
 import { Dashboard } from './pages/Dashboard';
@@ -43,7 +44,7 @@ export function App() {
     DEFAULT_CONTACTS
   );
 
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
   const [currentTab, setCurrentTab] = useState<NavTab>('dashboard');
   const [isSirenOpen, setIsSirenOpen] = useState(false);
   const [isFakeCallOpen, setIsFakeCallOpen] = useState(false);
@@ -53,6 +54,33 @@ export function App() {
   // Escort hand-off state from Map to Walk With Me
   const [escortDestination, setEscortDestination] = useState<string | undefined>();
   const [escortEtaMins, setEscortEtaMins] = useState<number | undefined>();
+
+  // PWA Install prompt state
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+      setShowInstallBanner(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const choiceResult = await installPrompt.userChoice;
+    if (choiceResult.outcome === 'accepted') {
+      setShowInstallBanner(false);
+    }
+    setInstallPrompt(null);
+  };
 
   const handleStartWalkFromMap = (dest: string, etaMins: number) => {
     setEscortDestination(dest);
@@ -120,6 +148,36 @@ export function App() {
           userName="Kartik"
           onOpenSOS={() => setIsSOSOpen(true)}
         />
+
+        {/* PWA Mobile Web App Install Banner */}
+        {showInstallBanner && (
+          <div className="mx-4 mt-2 p-2.5 rounded-2xl bg-[#1C1C1C] border border-[#FFD400]/40 flex items-center justify-between gap-2 shadow-lg animate-in fade-in">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-[#FFD400]/15 flex items-center justify-center text-[#FFD400] shrink-0">
+                <Download className="w-3.5 h-3.5" />
+              </div>
+              <div className="truncate">
+                <span className="text-xs font-bold text-white block truncate">Install RAKSHA PWA</span>
+                <span className="text-[10px] text-[#A0A0A0] block truncate">Instant offline emergency shield</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                onClick={handleInstallClick}
+                className="px-2.5 py-1 rounded-xl bg-[#FFD400] hover:bg-[#ffe033] text-[#090909] font-bold text-[11px] shadow-sm transition-all"
+              >
+                Install
+              </button>
+              <button
+                onClick={() => setShowInstallBanner(false)}
+                className="p-1 text-[#A0A0A0] hover:text-white rounded-lg"
+                title="Dismiss banner"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Main Content Viewport */}
         <main className="flex-1 px-4 pt-3 pb-16 overflow-y-auto">
